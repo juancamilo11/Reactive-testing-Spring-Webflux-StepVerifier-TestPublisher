@@ -57,4 +57,37 @@ class MyServiceTest {
                 .expectComplete()
                 .verify();
     }
+
+    @Test
+    void testSearchAllWithError() {
+        Flux<String> sourceWithError = myService.searchAllWithError();
+        StepVerifier
+                .create(sourceWithError)
+                .expectNextCount(4)
+                .expectErrorMatches(throwable -> throwable instanceof IllegalArgumentException &&
+                        throwable.getMessage().equals("Message for the error")
+                ).verify();
+    }
+
+    //Solo podemos usar un método para verificar las excepciones. La señal OnError notifica al suscriptor que el editor está cerrado con un estado de error. Por lo tanto, no podemos agregar más expectativas después.
+    //
+    //Si no es necesario verificar el tipo y el mensaje de la excepción a la vez, podemos usar uno de los métodos dedicados:
+    //
+    //expectError() - esperar cualquier tipo de error
+    //expectError(Class<? extends Throwable> class) - espera un error de un tipo específico
+    //expectErrorMessage(String errorMessage) - se espera un error con un mensaje específico
+    //expectErrorMatches(Predicate<Throwable> predicate) - se espera un error que coincida con un predicado dado
+    //expectErrorSatisfies(Consumer<Throwable> assertionConsumer) - consume un Throwable para hacer una aserción personalizada
+
+    @Test
+    void testWithVirtualTime(){
+        StepVerifier.withVirtualTime(() -> Flux.interval(Duration.ofSeconds(1)).take(2))
+                .expectSubscription()
+                .expectNoEvent(Duration.ofSeconds(1)) //método de expectativa que se ocupa del tiempo
+                .expectNext(0L)
+                .thenAwait(Duration.ofSeconds(1)) //método de expectativa que se ocupa del tiempo
+                .expectNext(1L)
+                .verifyComplete();
+    }
+
 }

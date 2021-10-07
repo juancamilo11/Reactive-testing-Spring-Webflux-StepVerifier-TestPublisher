@@ -28,4 +28,15 @@ public class MyService {
                 .map(String::toUpperCase);
         return source;
     }
+
+    public Flux<String> searchAllWithError() {
+        Flux<String> source = Flux.just("John", "Monica", "Mark", "Cloe", "Frank", "Casper", "Olivia", "Emily", "Cate")
+                .filter(name -> name.length() == 4)
+                .map(String::toUpperCase);
+        Flux<String> error = source.concatWith(
+                Mono.error(new IllegalArgumentException("Message for the error"))
+        );
+        return error;
+    }
+
 }
