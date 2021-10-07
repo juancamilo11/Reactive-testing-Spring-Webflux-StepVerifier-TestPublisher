@@ -45,4 +45,16 @@ class MyServiceTest {
                 .expectNext("Carmen")
                 .thenAwait(Duration.ofSeconds(5)).verifyComplete();
     }
+
+    @Test
+    void testSearchAllWithFilter(){
+        Flux<String> someFiltered = myService.searchAllWithFilter();
+        StepVerifier
+                .create(someFiltered)
+                .expectNext("JOHN")
+                .expectNextMatches(name -> name.startsWith("MA"))
+                .expectNext("CLOE", "CATE")
+                .expectComplete()
+                .verify();
+    }
 }
