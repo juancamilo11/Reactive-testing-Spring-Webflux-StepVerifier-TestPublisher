@@ -7,27 +7,42 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.time.Duration;
 
 @SpringBootTest
-    class MyServiceTest {
-        @Autowired
-        MyService myService;
+class MyServiceTest {
+
+    @Autowired
+    MyService myService;
 
     @Test
-        void testMono() {
-            Mono<String> one = myService.searchOne();
-            StepVerifier.create(one).expectNext("Pedro").verifyComplete();
-        }
-        @Test
-        void testVarios() {
-            Flux<String> some = myService.searchAll();
-            StepVerifier
-                    .create(some)
-                    .expectNext("Pedro")
-                    .expectNext("Maria")
-                    .expectNext("Jesus")
-                    .expectNext("Carmen")
-                    .verifyComplete();
-        }
+    void testOne() {
+        Mono<String> one = myService.searchOne();
+        StepVerifier.create(one).expectNext("Pedro").verifyComplete();
     }
+    @Test
+    void testSome() {
+        Flux<String> some = myService.searchAll();
+        StepVerifier
+                .create(some)
+                .expectNext("Pedro")
+                .expectNext("Maria")
+                .expectNext("Jesus")
+                .expectNext("Carmen")
+                .verifyComplete();
+    }
+
+    @Test
+    void testSomeSlow(){
+        Flux<String> some = myService.searchAllSlow();
+        StepVerifier.create(some)
+                .expectNext("Pedro")
+                .thenAwait(Duration.ofSeconds(5))
+                .expectNext("Maria")
+                .thenAwait(Duration.ofSeconds(5))
+                .expectNext("Jesus")
+                .thenAwait(Duration.ofSeconds(5))
+                .expectNext("Carmen")
+                .thenAwait(Duration.ofSeconds(5)).verifyComplete();
+    }
+}
