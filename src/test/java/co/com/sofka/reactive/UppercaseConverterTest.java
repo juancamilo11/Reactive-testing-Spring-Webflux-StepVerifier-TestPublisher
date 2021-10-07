@@ -19,5 +19,18 @@ public class UppercaseConverterTest {
                 .verifyComplete();
     }
 
+    @Test
+    void testPublisherWithError() {
+        TestPublisher
+                .<String>create()
+                .next("Primero", "Segundo", "Tercero")
+                .error(new RuntimeException("Message for the error."));
+    }
 
+    @Test
+    void testPublisherWithNull() {
+        TestPublisher
+                .createNoncompliant(TestPublisher.Violation.ALLOW_NULL)
+                .emit("1", "2", null, "3");
+    }
 }
