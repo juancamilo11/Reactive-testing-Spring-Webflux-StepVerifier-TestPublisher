@@ -90,4 +90,16 @@ class MyServiceTest {
                 .verifyComplete();
     }
 
+    @Test
+    void testEmitAssertsAfterExecution(){
+        Flux<Integer> source = myService.emitAssertsAfterExecution();
+        StepVerifier.create(source)
+                .expectNext(2)
+                .expectComplete()
+                .verifyThenAssertThat()
+                .hasDropped(4)
+                .tookLessThan(Duration.ofMillis(1050));
+    }
+
+
 }
